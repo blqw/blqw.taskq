@@ -156,7 +156,9 @@ var taskq = new_taskq.global();
 api | 说明 | 详细
 :---|:---|:---:
 append()|追加任务|[查看](apidoc/append.md)
+appendAsync()|追加异步任务|等价于调用方法前执行了`q.async`
 insert()|插入任务|[参考 append](apidoc/append.md)
+insertAsync()|插入异步任务|等价于调用方法前执行了`q.async`
 running()|判断是队列否正在执行|`if(taskq.running()){...}`
 count()|待执行任务数|`if(taskq.count() > 0){...}`
 new()|返回新的taskq对象|`new_taskq = taskq.new()`
