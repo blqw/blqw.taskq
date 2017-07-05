@@ -50,16 +50,16 @@ taskq.append(function(q){
     },1000);
 }); 
 taskq.append(function(q){
-    q.async(); //表示这个是一个异步任务
+    q.async(); 
     $.get("api/v1/user/1").done(function(result){
-        q.next(); //异步任务, 需要调用 q.next() 表示异步完成
+        q.next(); 
     },1000);
 }); 
 
 taskq.appendAsync(function(q){
     //使用 appendAsync 就不需要单独调用 q.async();
     $.get("api/v1/user/1").done(function(result){
-        q.next(); //异步任务, 需要调用 q.next() 表示异步完成
+        q.next(); 
     },1000);
 }); 
 //不推荐 appendAsync
