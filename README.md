@@ -49,13 +49,12 @@ taskq.append(function(q){
     },1000);
 }); 
 
-taskq.appendAsync(function(q){
+taskq.appendAsync(function(q){  //不推荐
     //使用 appendAsync 就不需要单独调用 q.async();
     $.get("api/v1/user/1").done(function(result){
         q.next(); 
     },1000);
 }); 
-//不推荐 appendAsync
 ```
 
 ### 3. Promise
@@ -81,18 +80,11 @@ taskq.append(function(q){
 var posts = fetchival('/posts')
 taskq.append(...); 
 taskq.append(posts(1).put({ title: 'Fetchival is simple' })); //立即请求, 等请求返回后继续下一个任务
-taskq.append(posts(1).put, null, [{ title: 'Fetchival is simple' }]); //第三个参数将作为 调用 posts(1).put 方法的参数列表
+taskq.append(posts(1).put, [{ title: 'Fetchival is simple' }]); //第二个参数将作为 调用 posts(1).put 方法的参数列表
 // 可以理解为 arguments[0].apply(arguments[1], arguments[2])
 ``` 
 
-### 5. this作用域
-```js
-taskq.append(function(q){
-    //this === document
-}, document);
-```
-
-### 6. 统一异常处理
+### 5. 统一异常处理
 ```js
 //只能设置一个 onerror 处理函数
 task.onerror = function(q, error){
@@ -101,6 +93,7 @@ task.onerror = function(q, error){
     // q.suspend() 挂起任务
     // q.resume() 恢复任务执行
     // q.reset() 重置任务队列
+    // 如果不进行任何操作将会继续下一个任务
 }; 
 taskq.append(function(q){
     console.log("1");
@@ -115,7 +108,7 @@ taskq.append(function(q){
 
 ```
 
-### 7. 并行任务
+### 6. 并行任务
 ```js
 taskq.append(...); 
 taskq.append([
@@ -130,11 +123,11 @@ taskq.append([
         throw new Error(...);
     }
 ]); 
-//上面3个任务同时开始, 等待执行成功, 并且异常处理完成后才继续下面的任务
+//上面3个任务同时开始, 等待全部执行成功, 并且异常处理完成后才继续下面的任务
 taskq.append(...);
 ```
 
-### 8. 新队列和全局队列
+### 7. 新队列和全局队列
 `taskq`本身是全局共享的
 ```js
 //如果希望开启一个独立的任务队列可以
