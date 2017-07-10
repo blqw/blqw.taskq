@@ -24,9 +24,11 @@ require(["taskq"], function (taskq) {
 taskq.append(function(q){
     console.log(1);
 }); 
+...
 taskq.append(function(q){
     console.log(2);
 }); 
+...
 taskq.append(function(q){
     console.log(3);
 }); 
@@ -38,16 +40,26 @@ taskq.append(function(q){
 taskq.append(function(q){
     q.async(); //表示这个是一个异步任务
     setTimeout(function(){
-        //balabala...
+        ...
         q.next(); //异步任务, 需要调用 q.next() 表示异步完成
     },1000);
 }); 
-taskq.append(function(q){
-    q.async(); 
-    $.get("api/v1/user/1").done(function(result){
-        q.next(); 
-    },1000);
-}); 
+taskq.append(fetch, ['api/v1/user/1',taskq], 
+    function(response){
+        ...
+    },
+    function(error){
+        ...
+    }
+);
+taskq.append(function(q, $){
+    q.async();
+    $.getJSON('api/v1/user/1')
+        .done(function(data){q.next(data);})
+        .fail(function(err){q.error(err);});
+    }, [taskq, jQuery], function(data){
+        ...
+    });
 ```
 
 ### 3. 异常处理
@@ -101,8 +113,10 @@ status|返回当前队列的状态|"idle", "running", "suspend"
 ### 参数`q`
 api | 说明 | 详细
 :---|:---|:---
-taskq()|获取当前的taskq对象|`var tq = q.taskq()`
 async()|声明当前方法为异步|[查看](apidoc/??.md)
-next(result)|异步任务结束|[查看](apidoc/??.md)
+resolve(result)|当前任务结束|[参照](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Promise/resolve)
+next(result)|功能同上|`resolve`的别名
+reject(result)|当前任务出错|[参照](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Promise/reject)
+error(result)|功能同上|`reject`的别名
 append(any)|追加子任务|参考`taskq.append`, 被添加的任务, 在当前任务结束, 下个任务之前执行
 
