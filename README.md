@@ -113,7 +113,7 @@ status|返回当前队列的状态|"idle", "running", "suspend"
 ### 参数`q`
 api | 说明 | 详细
 :---|:---|:---
-async()|声明当前方法为异步|[查看](apidoc/??.md)
+async()|声明当前方法为异步|表示当前任务结束后不开始下一个任务, 等待`q.next()`信号
 resolve(result)|当前任务结束|[参照](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Promise/resolve)
 next(result)|功能同上|`resolve`的别名
 reject(result)|当前任务出错|[参照](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Promise/reject)
