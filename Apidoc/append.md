@@ -112,7 +112,7 @@ function append(function(q){
 传入一组任务数组, 同时开始    
 全部执行完成之后继续下一个队列任务
 ```js
-function append(Array(function|promise|fetch|thenable), array)
+function append(Array(function|promise|fetch|thenable), Array(object|taskq)|object)
 ```
 ```js
 //无参数
