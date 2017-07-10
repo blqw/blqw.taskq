@@ -1,12 +1,12 @@
 ## append 方法完整签名
 ```js
 taskq.append(tasks, args, then, catch)
-
-tasks: function|promise|fetch|thenable|Array(function|promise|fetch|thenable)|number
-args: Array(object|taskq)|object
-then: function
-catch: function
 ```
++ tasks: `function|promise|fetch|thenable|Array(function|promise|fetch|thenable)|number`
++ args: `Array(object|taskq)|object`
++ then: `function`
++ catch: `function`
+
 
 ## 1. 添加任务函数
 添加一个普通的任务
