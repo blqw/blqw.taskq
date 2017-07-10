@@ -100,7 +100,7 @@ var taskq = new_taskq.global();
 ### taskq
 api | 说明 | 详细
 :---|:---|:---
-append()|追加任务|[查看](apidoc/append.md)
+append()|追加任务|[查看](//github.com/blqw/blqw.taskq/blob/master/Apidoc/append.md)
 new()|返回新的taskq对象|`new_taskq = taskq.new()`
 global()|返回全局taskq对象|`taskq = new_taskq.global()`
 reset()|重置任务|清空任务队列, 并抛弃正在执行的任务)
