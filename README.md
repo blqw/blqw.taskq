@@ -32,7 +32,7 @@ taskq.append(function(q){
 }); 
 ```
 
-### 2. 一般异步任务
+### 2. 异步任务
 
 ```js
 taskq.append(function(q){
@@ -50,7 +50,7 @@ taskq.append(function(q){
 }); 
 ```
 
-### 3. 统一异常处理
+### 3. 异常处理
 ```js
 //只能设置一个 onerror 处理函数
 task.onerror = function(q, error){
@@ -74,7 +74,7 @@ taskq.append(function(q){
 
 ```
 
-### 4. 新队列和全局队列
+### 4. 全局队列 和 独立队列
 `taskq`本身是全局共享的
 ```js
 //如果希望开启一个独立的任务队列可以
