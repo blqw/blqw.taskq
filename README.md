@@ -104,5 +104,5 @@ api | 说明 | 详细
 taskq()|获取当前的taskq对象|`var tq = q.taskq()`
 async()|声明当前方法为异步|[查看](apidoc/??.md)
 next(result)|异步任务结束|[查看](apidoc/??.md)
-append()|追加子任务|参考`taskq.append`, 被添加的任务, 在当前任务结束, 下个任务之前执行
+append(any)|追加子任务|参考`taskq.append`, 被添加的任务, 在当前任务结束, 下个任务之前执行
 
