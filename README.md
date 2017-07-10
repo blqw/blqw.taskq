@@ -5,19 +5,12 @@ js 任务队列
 ### 1. js
 ```html
  <script src="taskq.js"></script>
- <script>
-    taskq.append(...);
- </script>
 ```
 
 ### 2. AMD
 ```js
 require(["taskq"], function (taskq) {
-    taskq.append(function(tq){ //默认添加的任务为异步
-        setTimeout(function(){
-            tq.next(); //用于通知任务已经完成
-        }, this.millisec);
-    }, { millisec: 1000 } /* 表示中的作用域 */ );
+
 });
 ```
 
