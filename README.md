@@ -105,7 +105,7 @@ new()|返回新的taskq对象|`new_taskq = taskq.new()`
 global()|返回全局taskq对象|`taskq = new_taskq.global()`
 reset()|重置任务|清空任务队列, 并抛弃正在执行的任务)
 clear()|清空任务|清空任务队列 当前正在执行的任务不受影响)
-suspend()|挂起队列|当前任务执行完成之后不进入下一任务, 直到主动调用`resume`)
+suspend()|挂起队列|当前任务执行完成之后不进入下一任务, 直到主动调用`resume()`)
 resume()|恢复队列|继续执行被挂起的队列)
 onerror|异常处理函数|队列任务出现任何异常, 进入该方法)
 status|返回当前队列的状态|"idle", "running", "suspend"
@@ -113,7 +113,7 @@ status|返回当前队列的状态|"idle", "running", "suspend"
 ### 参数`q`
 api | 说明 | 详细
 :---|:---|:---
-async()|声明当前方法为异步|表示当前任务结束后不开始下一个任务, 等待`q.next()`信号
+async()|声明当前方法为异步|表示当前任务结束后不开始下一个任务, 直到主动调用`q.next()`
 resolve(result)|当前任务结束|[参照](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Promise/resolve)
 next(result)|功能同上|`resolve`的别名
 reject(result)|当前任务出错|[参照](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Promise/reject)
