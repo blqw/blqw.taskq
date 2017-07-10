@@ -48,43 +48,9 @@ taskq.append(function(q){
         q.next(); 
     },1000);
 }); 
-
-taskq.appendAsync(function(q){  //不推荐
-    //使用 appendAsync 就不需要单独调用 q.async();
-    $.get("api/v1/user/1").done(function(result){
-        q.next(); 
-    },1000);
-}); 
 ```
 
-### 3. Promise
-[Promise 例子](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Promise#示例)
-```js
-taskq.append(...);
-taskq.append(new Promise(function(resolve, reject){
-    setTimeout(function(){
-        resolve("成功!");
-    }, 250);
-}).then(function(successMessage){
-    console.log("Yay! " + successMessage);
-})); 
-taskq.append(function(q){
-    //...
-});
-```
-
-### 4. Fetch
-[Fetch_API 文档](https://developer.mozilla.org/zh-CN/docs/Web/API/Fetch_API/Using_Fetch#进行_fetch_请求)   
-例子中的 [`fetchival` 参见这里](https://github.com/typicode/fetchival)
-```js
-var posts = fetchival('/posts')
-taskq.append(...); 
-taskq.append(posts(1).put({ title: 'Fetchival is simple' })); //立即请求, 等请求返回后继续下一个任务
-taskq.append(posts(1).put, [{ title: 'Fetchival is simple' }]); //第二个参数将作为 调用 posts(1).put 方法的参数列表
-// 可以理解为 arguments[0].apply(arguments[1], arguments[2])
-``` 
-
-### 5. 统一异常处理
+### 3. 统一异常处理
 ```js
 //只能设置一个 onerror 处理函数
 task.onerror = function(q, error){
@@ -108,26 +74,7 @@ taskq.append(function(q){
 
 ```
 
-### 6. 并行任务
-```js
-taskq.append(...); 
-taskq.append([
-    function(q){
-        //任务1
-    },
-    function(q){
-        q.async();
-        api.get().then(q.next);
-    },
-    function(q){
-        throw new Error(...);
-    }
-]); 
-//上面3个任务同时开始, 等待全部执行成功, 并且异常处理完成后才继续下面的任务
-taskq.append(...);
-```
-
-### 7. 新队列和全局队列
+### 4. 新队列和全局队列
 `taskq`本身是全局共享的
 ```js
 //如果希望开启一个独立的任务队列可以
@@ -142,25 +89,20 @@ var taskq = new_taskq.global();
 api | 说明 | 详细
 :---|:---|:---:
 append()|追加任务|[查看](apidoc/append.md)
-appendAsync()|追加异步任务|等价于调用方法前执行了`q.async`
-insert()|插入任务|[参考 append](apidoc/append.md)
-insertAsync()|插入异步任务|等价于调用方法前执行了`q.async`
-running()|判断是队列否正在执行|`if(taskq.running()){...}`
-count()|待执行任务数|`if(taskq.count() > 0){...}`
 new()|返回新的taskq对象|`new_taskq = taskq.new()`
 global()|返回全局taskq对象|`taskq = new_taskq.global()`
-reset()|重置任务|[查看](apidoc/??.md)
-clear()|清空任务|[查看](apidoc/??.md)
-suspend()|挂起队列|[查看](apidoc/??.md)
-resume()|恢复队列|[查看](apidoc/??.md)
-onerror|异常处理函数|[查看](apidoc/??.md)
-asyncq|返回调用了`async()`方法的`q`对象|`var q = taskq.asyncq()`
+reset()|重置任务|清空任务队列, 并抛弃正在执行的任务)
+clear()|清空任务|清空任务队列 当前正在执行的任务不受影响)
+suspend()|挂起队列|当前任务执行完成之后不进入下一任务, 直到主动调用`resume`)
+resume()|恢复队列|继续执行被挂起的队列)
+onerror|异常处理函数|队列任务出现任何异常, 进入该方法)
+status|返回当前队列的状态|"idle", "running", "suspend"
 
 ### 参数`q`
 api | 说明 | 详细
 :---|:---|:---:
 taskq()|获取当前的taskq对象|`var tq = q.taskq()`
 async()|声明当前方法为异步|[查看](apidoc/??.md)
-next()|异步任务结束|[查看](apidoc/??.md)
-append()|追加任务|等价于`q.taskq().append(...)`
-insert()|插入任务|等价于`q.taskq().insert(...)`
+next(result)|异步任务结束|[查看](apidoc/??.md)
+append()|追加子任务|参考`taskq.append`, 被添加的任务, 在当前任务结束, 下个任务之前执行
+
