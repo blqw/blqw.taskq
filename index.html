@@ -6,14 +6,17 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Hello TaskQ</title>
+    <script src="blqw.taskq.js"></script>
 </head>
 
 <body>
 
 
-    <!-- <script>
-        var f = fetch();
-    </script> -->
+    <script>
+        taskq.append(function () { console.log(1) });
+        taskq.append(function () { console.log(2) });
+        taskq.append(function () { console.log(3) });
+    </script>
 
 </body>
 
