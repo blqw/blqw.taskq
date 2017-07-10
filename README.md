@@ -87,7 +87,7 @@ var taskq = new_taskq.global();
 
 ### taskq
 api | 说明 | 详细
-:---|:---|:---:
+:---|:---|:---
 append()|追加任务|[查看](apidoc/append.md)
 new()|返回新的taskq对象|`new_taskq = taskq.new()`
 global()|返回全局taskq对象|`taskq = new_taskq.global()`
@@ -100,7 +100,7 @@ status|返回当前队列的状态|"idle", "running", "suspend"
 
 ### 参数`q`
 api | 说明 | 详细
-:---|:---|:---:
+:---|:---|:---
 taskq()|获取当前的taskq对象|`var tq = q.taskq()`
 async()|声明当前方法为异步|[查看](apidoc/??.md)
 next(result)|异步任务结束|[查看](apidoc/??.md)
