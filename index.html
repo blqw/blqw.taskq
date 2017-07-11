@@ -7,15 +7,357 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Hello TaskQ</title>
     <script src="blqw.taskq.js"></script>
+    <script src="//cdn.staticfile.org/jquery/3.2.1/jquery.js"></script>
 </head>
 
 <body>
+    <div id="test-logs">
 
+    </div>
 
     <script>
-        taskq.append(function () { console.log(1) });
-        taskq.append(function () { console.log(2) });
-        taskq.append(function () { console.log(3) });
+        function assert(expected, actual) {
+            if (expected === actual) {
+                console.info("success");
+                log("..........success", "green");
+            } else {
+                var message = ["fail: expected=", expected, " actual=", actual].join("");
+                log(".........." + message, "red");
+                console.error(font.innerText);
+            }
+        }
+        function enter(name) {
+            var message = "正在测试 『" + name + "』";
+            log(message, null, true);
+            console.warn(message);
+        }
+        function log(message, color, newline) {
+            if (newline) {
+                document.getElementById("test-logs").appendChild(document.createElement("br"));
+                var time = new Date();
+                message = [(time.getMinutes() + "00").substr(0, 2), (time.getSeconds() + "00").substr(0, 2), (time.getMilliseconds() + "000").substr(0, 3)].join(":") + "  " + message;
+            }
+            var span = document.createElement("span");
+            span.innerText = message;
+            span.style.color = color;
+            document.getElementById("test-logs").appendChild(span);
+        }
+        var test = [
+            function (taskq) { // 一般任务
+                enter("一般任务");
+                var logs = [];
+                taskq.append(function () { logs.push(1) });
+                taskq.append(function () { logs.push(2) });
+                taskq.append(function () { logs.push(3) });
+                taskq.append(function () {
+                    assert("1|2|3", logs.join("|"));
+                });
+            },
+            function (taskq) { // 带参任务
+                enter("带参任务");
+                var logs = [];
+                taskq.append(function (logs) { logs.push(1) }, [logs]);
+                taskq.append(function (logs) { logs.push(2) }, [logs]);
+                taskq.append(function (logs) { logs.push(3) }, [logs]);
+                taskq.append(function (logs) {
+                    assert("1|2|3", logs.join("|"));
+                }, [logs]);
+            },
+            function (taskq) { // 异步带参任务
+                enter("异步带参任务");
+                var seconds = { value: new Date().getSeconds() };
+                var validValue = seconds.value;
+                validValue += "A" + (validValue + 1);
+                validValue += "B" + (validValue + 1);
+                validValue += "C" + (validValue + 1);
+                taskq.append(function (seconds, q) {
+                    q.async();
+                    setTimeout(function () {
+                        seconds.value += "A" + (seconds.value + 1);
+                        q.next();
+                    }, 1000);
+                }, [seconds, taskq]);
+                taskq.append(function (seconds, q) {
+                    q.async();
+                    setTimeout(function () {
+                        seconds.value += "B" + (seconds.value + 1);
+                        q.next();
+                    }, 1000);
+                }, [seconds, taskq]);
+                taskq.append(function (seconds, q) {
+                    q.async();
+                    setTimeout(function () {
+                        seconds.value += "C" + (seconds.value + 1);
+                        q.next();
+                    }, 1000);
+                }, [seconds, taskq]);
+                taskq.append(function (seconds) {
+                    assert(validValue, seconds.value);
+                }, [seconds]);
+            },
+            function (taskq) { // 同步任务带返回值
+                enter("同步任务带返回值");
+                var value = 0;
+                taskq.append(function () { return 1 }, null, function (result) { value += result; });
+                taskq.append(function () { return 2 }, null, function (result) { value += result; });
+                taskq.append(function () { return 3 }, null, function (result) { value += result; });
+                taskq.append(function () {
+                    assert(6, value);
+                });
+            },
+            function (taskq) { // 异步任务带返回值
+                enter("异步任务带返回值");
+                var value = 0;
+                taskq.append(function (q) {
+                    q.async();
+                    setTimeout(function () {
+                        q.next(1);
+                    }, 100);
+                }, null, function (result) { value += result; });
+                taskq.append(function (q) {
+                    q.async();
+                    setTimeout(function () {
+                        q.next(2);
+                    }, 100);
+                }, null, function (result) { value += result; });
+                taskq.append(function (q) {
+                    q.async();
+                    setTimeout(function () {
+                        q.next(3);
+                    }, 100);
+                }, null, function (result) { value += result; });
+                taskq.append(function () {
+                    assert(6, value);
+                });
+            },
+            function (taskq) { // 异常处理1
+                enter("异常处理1");
+                var message;
+                taskq.onerror = function (error) {
+                    message = error.message;
+                }
+                taskq.append(function () {
+                    throw Error("测试异常1");
+                });
+                taskq.append(function () {
+                    assert("测试异常1", message);
+                });
+            },
+            function (taskq, q) { // 异常处理2
+                enter("异常处理2");
+                var message;
+                taskq.onerror = function (error) {
+                    if (error.message !== "测试异常2") {
+                        throw error;
+                    } else {
+                        taskq.reset();
+                        taskq.append(function () {
+                            assert(null, null);
+                            q.next();
+                        });
+                    }
+                }
+                taskq.append(function () {
+                    throw Error("测试异常2");
+                });
+                taskq.append(function () {
+                    assert(null, 1);
+                });
+            },
+            function (taskq) { // 异常处理3
+                enter("异常处理3");
+                var message = "";
+                taskq.onerror = function (error) {
+                    message += "aaa";
+                }
+                taskq.append(function () {
+                    throw Error("异常处理3");
+                }, null, null, function (error) {
+                    message += error.message;
+                });
+                taskq.append(function () {
+                    assert("异常处理3", message);
+                });
+            },
+            function (taskq) { // 异常处理4
+                enter("异常处理4");
+                var message;
+                taskq.onerror = function (error) {
+                    message = error.message;
+                }
+                taskq.append(function () {
+                    throw Error("异常处理x");
+                }, null, null, function (error) {
+                    if ("异常处理x" === error.message) {
+                        throw Error("异常处理4");
+                    }
+                });
+                taskq.append(function () {
+                    assert("异常处理4", message);
+                });
+            },
+            function (taskq) { //异步异常1
+                enter("异步异常1");
+                var message;
+                taskq.onerror = function (error) {
+                    message = error;
+                }
+                taskq.append(function (q) {
+                    q.async();
+                    setTimeout(function () {
+                        q.error("异步异常1");
+                    }, 100);
+                });
+                taskq.append(function () {
+                    assert("异步异常1", message);
+                });
+            },
+            function (taskq) { // 异步异常2
+                enter("异步异常2");
+                var message = "";
+                taskq.onerror = function (error) {
+                    message += "aaa";
+                }
+                taskq.append(function () {
+                    throw Error("异步异常2");
+                }, null, null, function (error) {
+                    message += error.message;
+                });
+                taskq.append(function () {
+                    assert("异步异常2", message);
+                });
+            },
+            function (taskq) { // promise
+                enter("promise");
+                var logs = [];
+                taskq.append(function (resolve) { logs.push(1); resolve(); }.promise());
+                taskq.append(function (resolve) { resolve(2); }.promise(), [1], function (value) { logs.push(value) });
+                taskq.append(function (resolve, reject) { reject(3); }.promise(), null, null, function (value) { logs.push(value) });
+                taskq.append(function () {
+                    assert("1|2|3", logs.join("|"));
+                });
+            },
+            function (taskq) { // thenable
+                enter("thenable");
+                var logs = [];
+                taskq.append(function (resolve) { logs.push(1); resolve(); }.thenable());
+                taskq.append(function (resolve) { resolve(2); }.thenable(), [1], function (value) { logs.push(value) });
+                taskq.append(function (resolve, reject) { reject(3); }.thenable(), null, null, function (value) { logs.push(value) });
+                taskq.append(function () {
+                    assert("1|2|3", logs.join("|"));
+                });
+            },
+            function (taskq) { // fetch
+                enter("fetch");
+                var logs = [];
+                taskq.append(fetch(location.href).then(function (response) { response.ok && logs.push(1); }));
+                taskq.append(fetch, [location.href], function (response) { response.ok && logs.push(2); });
+                taskq.append(fetch(location.href).then(function (response) { return response.ok && 3; }), null, function (value) { logs.push(value); });
+                taskq.append(fetch(location.href).then(function (response) { throw new Error(4) }), null, null, function (error) { logs.push(error.message); });
+                taskq.append(function () {
+                    assert("1|2|3|4", logs.join("|"));
+                });
+            },
+            function (taskq) { // jquery.ajax
+                enter("jQuery.ajax");
+                var logs = [];
+                taskq.append($.get(location.href).then(function () { logs.push(1); }));
+                taskq.append($.get, [location.href], function () { logs.push(2); });
+                taskq.append($.get(location.href).then(function () { return 3; }), null, function (value) { logs.push(value); });
+                taskq.append($.get(location.href).then(function () { throw new Error(4) }), null, null, function (error) { logs.push(error.message); });
+                taskq.append(function () {
+                    assert("1|2|3|4", logs.join("|"));
+                });
+            },
+            function (taskq) { // 延迟任务
+                enter("延迟任务");
+                var time = new Date().getSeconds();
+                taskq.append(2000, null);
+                taskq.append(function () {
+                    var t = new Date().getSeconds();
+                    if (time >= 58) {
+                        t += 60;
+                    }
+                    assert(time + 2, t);
+                });
+            },
+            function (taskq) { // 子任务
+                enter("子任务");
+                var logs = [];
+                taskq.append(function (q, log) {
+                    q.async();
+                    log.push(1);
+                    q.append(function (l) { l.push(2); }, [logs]);
+                    q.append(function () { log.push(3); });
+                    q.append(function () { logs.push(4); });
+                    q.append(q.next);
+                }, [taskq, logs]);
+                taskq.append(function () {
+                    assert("1|2|3|4", logs.join("|"));
+                });
+            },
+            function (taskq, q) { // 重置任务
+                enter("重置任务");
+                var value = 0;
+                taskq.append(function () { value = 1; });
+                taskq.append(500, null, function () { value = 2; });
+                taskq.append(function () { value = 3; });
+                setTimeout(function () {
+                    taskq.reset();
+                    taskq.append(function () {
+                        assert(1, value);
+                        q.next();
+                    });
+                }, 100);
+            },
+            function (taskq, q) { // 清空任务
+                enter("清空任务");
+                var value = 0;
+                taskq.append(function () { value = 1; });
+                taskq.append(500, null, function () { value = 2; });
+                taskq.append(function () { value = 3; });
+                setTimeout(function () {
+                    taskq.clear();
+                    taskq.append(function () {
+                        assert(2, value);
+                        q.next();
+                    });
+                }, 100);
+            },
+            function (taskq) { // 挂起/继续任务
+                enter("挂起/继续任务");
+                var time;
+                taskq.append(function () {
+                    time = new Date().getSeconds();
+                    taskq.suspend();
+                    log("任务队列挂起2秒", "blue", true);
+                    setTimeout(taskq.resume, 2000);
+                }, null, function () {
+                    log("这里不受影响", "blue", true);
+                })
+                taskq.append(function () {
+                    log("任务队列继续", "blue", true);
+                    var t = new Date().getSeconds();
+                    if (time >= 58) {
+                        t += 60;
+                    }
+                    assert(time + 2, t);
+                });
+            },
+        ];
+
+        for (var i = 0; i < test.length; i++) {
+            taskq.append(function (test, q) {
+                q.async();
+                var nq = taskq.new();
+                test(nq, q);
+                nq.append(function () {
+                    q.next();
+                });
+            }, [test[i], taskq]);
+        }
+        
+        taskq.append(function () { log("全部测试完成", "green", true); });
     </script>
 
 </body>
