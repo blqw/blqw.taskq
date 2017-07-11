@@ -105,11 +105,11 @@ api | 说明 | 详细
 append()|追加任务|[查看](//github.com/blqw/blqw.taskq/blob/master/Apidoc/append.md)
 new()|返回新的taskq对象|`new_taskq = taskq.new()`
 global()|返回全局taskq对象|`taskq = new_taskq.global()`
-reset()|重置任务|清空任务队列, 并抛弃正在执行的任务)
-clear()|清空任务|清空任务队列 当前正在执行的任务不受影响)
+reset()|重置任务|清空任务队列, 并抛弃正在执行的任务
+clear()|清空任务|清空任务队列 当前正在执行的任务不受影响
 suspend()|挂起队列|当前任务执行完成之后不进入下一任务, 直到主动调用`resume()`
-resume()|恢复队列|继续执行被挂起的队列)
-onerror|异常处理函数|队列任务出现任何异常, 进入该方法)
+resume()|恢复队列|继续执行被挂起的队列
+onerror|异常处理函数|队列任务出现任何异常, 进入该方法
 status|返回当前队列的状态|"idle", "running", "suspend"
 
 ### 参数`q`
