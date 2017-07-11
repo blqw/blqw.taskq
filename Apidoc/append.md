@@ -2,21 +2,24 @@
 ```js
 taskq.append(task, args, success, fail)
 ```
-> task: `function|promise|fetch|thenable|number`   
+### task
+`function|promise|fetch|thenable|number`   
+- 表示一个任务, 可以通过注册解释器`taskq.registerBuilder(type, function(task) returns Promise)`来支持更多的任务类型
 
-表示一个任务, 可以通过注册解释器`taskq.registerBuilder(type, function(task) returns Promise)`来支持更多的任务类型
+### args
+`Array(object|taskq)|object`
 
-> args: `Array(object|taskq)|object`
+- 表示任务参数, 如果传入`taskq`实例, 会被替换为参数q
 
-表示任务参数, 如果传入`taskq`实例, 会被替换为参数q
+### success
+`function`
 
-> success: `function`
+- 表示当前任务的成功回调
 
-表示当前任务的成功回调
+### fail
+`function`
 
-> fail: `function`
-
-表示当前任务的失败/异常回调, 该参数存在, 且处理异常后不继续抛出异常, 则不触发`onerror`
+- 表示当前任务的失败/异常回调, 该参数存在, 且处理异常后不继续抛出异常, 则不触发`onerror`
 
 
 ## 1. 添加任务函数
