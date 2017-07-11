@@ -1,5 +1,7 @@
-# blqw.taskq (*还没开始写代码, 只写了文档)
+# blqw.taskq 
 js 任务队列
+
+[单元测试](http://jsrun.net/7EYKp/show)
 
 ## 一、获取对象
 ### 1. js
