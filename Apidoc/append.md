@@ -69,7 +69,7 @@ taskq.append(fetch('flowers.jpg').then(result){ ... });
 //fetch + 参数 = 延迟执行
 taskq.append(fetch, ['flowers.jpg'], function(result){ ... });
 
-//thenable
+//thenable  jQuery的$.ajax属于 thenable 对象
 taskq.append({
     then : function(resolve, reject) {
         resolve("Success!");
