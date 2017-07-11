@@ -46,7 +46,7 @@ taskq.append(function(q){
         q.next(); //异步任务, 需要调用 q.next() 表示异步完成
     },1000);
 }); 
-taskq.append(fetch, ['api/v1/user/1',taskq], 
+taskq.append(fetch, ['api/v1/user/1'], 
     function(response){
         ...
     },
