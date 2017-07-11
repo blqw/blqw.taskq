@@ -136,15 +136,14 @@ taskq.append(function(millis, q){
 子任务全部执行完成后, 继续任务列队  
 ```js
 taskq.append(function(q){
+    q.async();
     q.append(function(){
         ...
     });
     q.append(function(){
         ...
     });
-    q.append(function(){
-        ...
-    });
+    q.append(q.next);
 });
 ```
 *参考 taskq.append*
