@@ -1,11 +1,11 @@
 ## append 方法完整签名
 ```js
-taskq.append(tasks, args, then, catch)
+taskq.append(tasks, args, success, fail)
 ```
-+ tasks: `function|promise|fetch|thenable|Array(function|promise|fetch|thenable)|number`
++ tasks: `function|promise|fetch|thenable|number`
 + args: `Array(object|taskq)|object`
-+ then: `function`
-+ catch: `function`
++ success: `function`
++ fail: `function`
 
 
 ## 1. 添加任务函数
@@ -69,7 +69,7 @@ taskq.append(fetch('flowers.jpg').then(result){ ... });
 //fetch + 参数 = 延迟执行
 taskq.append(fetch, ['flowers.jpg'], function(result){ ... });
 
-//thenable
+//thenable  jQuery的$.ajax属于 thenable 对象
 taskq.append({
     then : function(resolve, reject) {
         resolve("Success!");
@@ -108,37 +108,8 @@ function append(function(q){
 });
 ```
 
-## 5. 并行任务
-传入一组任务数组, 同时开始    
-全部执行完成之后继续下一个队列任务
-```js
-function append(Array(function|promise|fetch|thenable), Array(object|taskq)|object)
-```
-```js
-//无参数
-taskq.append([
-    function(q) { },
-    function(q) { },
-    function(q) { }
-]);
-//共享参数
-taskq.append([
-    function(window, $) { },
-    function(window, $) { },
-    function(window, $) { }
-], [window, jQuery]);
-//独立参数
-taskq.append([
-    function fun1(window) { },
-    function fun2($) { },
-    function fun3(window, $) { }
-], {
-    fun1:[window],
-    fun2:[jQuery],
-    fun3:[window, jQuery],
-});
-```
-*如果你愿意, 你也可以定义多个同名方法来使用相同的参数列表*
+## ~~5. 并行任务~~
+*由于js的单线程特性, 无需支持并行任务*
 
 ## 6. 延迟任务
 
@@ -176,4 +147,4 @@ taskq.append(function(q){
     });
 });
 ```
-更多方法, 参考 taskq.append
+*参考 taskq.append*
