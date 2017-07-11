@@ -147,4 +147,4 @@ taskq.append(function(q){
     });
 });
 ```
-更多方法, 参考 taskq.append
+*参考 taskq.append*
